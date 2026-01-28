@@ -1,0 +1,20 @@
+{
+	"recording.mode.studio": "Studio Mode",
+	"recording.mode.quick": "Quick Record",
+	"recording.mode.screenshot": "Screenshot",
+	"recording.button.start": "Start Recording",
+	"recording.button.stop": "Stop Recording",
+	"recording.button.pause": "Pause",
+	"recording.button.resume": "Resume",
+	"recording.audio.microphone": "Microphone",
+	"recording.audio.system": "System Audio",
+	"recording.audio.volume": "Volume",
+	"recording.camera.enable": "Enable Camera",
+	"recording.camera.disable": "Disable Camera",
+	"recording.camera.position": "Camera Position",
+	"recording.camera.size": "Camera Size",
+	"recording.success.title": "Recording Complete",
+	"recording.success.message": "Your recording has been saved",
+	"recording.success.view": "View Recording",
+	"recording.success.edit": "Edit in Editor"
+}

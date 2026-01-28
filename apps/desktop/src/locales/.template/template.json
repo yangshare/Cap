@@ -1,0 +1,47 @@
+{
+	"_comment": "Translation file template for Cap desktop application",
+	"_module": "[module-name]",
+	"_language": "en",
+	"_lastUpdated": "[YYYY-MM-DD]",
+
+	"_structure": {
+		"_description": "Translation keys follow the pattern: module.category.item",
+		"_example": "module.button.action, module.setting.name",
+		"_note": "Use lowercase letters and dots to separate sections"
+	},
+
+	"_naming": {
+		"_rules": [
+			"Use lowercase letters",
+			"Use dots to separate sections",
+			"Use English for key names",
+			"Be descriptive and concise"
+		],
+		"_examples": {
+			"good": [
+				"recording.button.start",
+				"settings.language.title",
+				"editor.action.cut"
+			],
+			"bad": ["ButtonStart", "recording_start_button", "btn-start-recording"]
+		}
+	},
+
+	"_usage": {
+		"_inCode": "const t = useI18n(); return <div>{t('module.category.item')}</div>",
+		"_withParams": "t('module.category.item', { name: 'value' })"
+	},
+
+	"_template": {
+		"module.category.title": "Title text",
+		"module.category.description": "Description text that explains what this does",
+		"module.category.action": "Action button text"
+	},
+
+	"_notes": [
+		"Add translations to both en/ and zh-CN/ directories",
+		"Keep translations concise and clear",
+		"Use parameters for dynamic values: {paramName}",
+		"Avoid concatenating translations in code"
+	]
+}

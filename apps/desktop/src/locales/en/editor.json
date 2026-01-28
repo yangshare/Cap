@@ -1,0 +1,19 @@
+{
+	"editor.title": "Video Editor",
+	"editor.button.trim": "Trim",
+	"editor.button.split": "Split",
+	"editor.button.delete": "Delete",
+	"editor.button.undo": "Undo",
+	"editor.button.redo": "Redo",
+	"editor.timeline": "Timeline",
+	"editor.timeline.zoom": "Zoom",
+	"editor.timeline.tracks": "Tracks",
+	"editor.export.title": "Export Video",
+	"editor.export.filename": "File Name",
+	"editor.export.format": "Format",
+	"editor.export.quality": "Quality",
+	"editor.export.progress": "Exporting...",
+	"editor.export.complete": "Export Complete",
+	"editor.error.load": "Failed to load video",
+	"editor.error.export": "Export failed"
+}

@@ -1,0 +1,22 @@
+{
+	"settings.title": "Settings",
+	"settings.general": "General",
+	"settings.language": "Language",
+	"settings.language.description": "Choose your preferred language",
+	"settings.language.current": "Current language",
+	"settings.language.options.zh-CN": "简体中文",
+	"settings.language.options.en": "English",
+	"settings.language.switchEffect": "Changes will take effect immediately across all windows",
+	"settings.recording": "Recording",
+	"settings.recording.quality": "Recording Quality",
+	"settings.recording.format": "Recording Format",
+	"settings.recording.location": "Save Location",
+	"settings.export": "Export",
+	"settings.export.format": "Export Format",
+	"settings.export.quality": "Export Quality",
+	"settings.export.location": "Export Location",
+	"settings.shortcuts": "Keyboard Shortcuts",
+	"settings.shortcuts.record": "Start/Stop Recording",
+	"settings.shortcuts.pause": "Pause/Resume Recording",
+	"settings.shortcuts.screenshot": "Take Screenshot"
+}

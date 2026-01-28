@@ -1,0 +1,19 @@
+{
+	"editor.title": "视频编辑器",
+	"editor.button.trim": "修剪",
+	"editor.button.split": "分割",
+	"editor.button.delete": "删除",
+	"editor.button.undo": "撤销",
+	"editor.button.redo": "重做",
+	"editor.timeline": "时间轴",
+	"editor.timeline.zoom": "缩放",
+	"editor.timeline.tracks": "轨道",
+	"editor.export.title": "导出视频",
+	"editor.export.filename": "文件名",
+	"editor.export.format": "格式",
+	"editor.export.quality": "质量",
+	"editor.export.progress": "正在导出...",
+	"editor.export.complete": "导出完成",
+	"editor.error.load": "加载视频失败",
+	"editor.error.export": "导出失败"
+}
