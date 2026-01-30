@@ -1,0 +1,7 @@
+{
+	"overlay.action.signInToUse": "登录以使用",
+	"overlay.error.screenshotFailed": "截图失败：{{reason}}",
+	"overlay.modeInfo.prefix": "什么是",
+	"overlay.modeInfo.suffix": "？",
+	"overlay.instantMode.limit": "即时模式录制时长限制为 {{minutes}} 分钟，"
+}

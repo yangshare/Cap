@@ -4,8 +4,10 @@ import { getCurrentWindow, UserAttentionType } from "@tauri-apps/api/window";
 import { relaunch } from "@tauri-apps/plugin-process";
 import { check, type Update } from "@tauri-apps/plugin-updater";
 import { createResource, createSignal, Match, Show, Switch } from "solid-js";
+import { useI18n } from "~/i18n";
 
 export default function () {
+	const t = useI18n();
 	const navigate = useNavigate();
 	const [updateError, setUpdateError] = createSignal<string | null>(null);
 
@@ -16,7 +18,7 @@ export default function () {
 			return update;
 		} catch (e) {
 			console.error("Failed to check for updates:", e);
-			setUpdateError("Unable to check for updates.");
+			setUpdateError(t("update.error.unableToCheck"));
 			return;
 		}
 	});
@@ -27,20 +29,21 @@ export default function () {
 				<div class="flex flex-col gap-4 items-center text-center max-w-md">
 					<p class="text-[--text-primary]">{updateError()}</p>
 					<p class="text-[--text-tertiary]">
-						Please download the latest version manually from cap.so/download.
-						Your data will not be lost.
+						{t("update.error.manualDownload")}
 					</p>
 					<p class="text-[--text-tertiary] text-xs">
-						If this issue persists, please contact support.
+						{t("update.error.contactSupport")}
 					</p>
-					<Button onClick={() => navigate("/")}>Go Back</Button>
+					<Button onClick={() => navigate("/")}>{t("main.back")}</Button>
 				</div>
 			</Show>
 			<Show
 				when={!updateError() && update()}
 				fallback={
 					!updateError() && (
-						<span class="text-[--text-tertiary]">No update available</span>
+						<span class="text-[--text-tertiary]">
+							{t("update.noneAvailable")}
+						</span>
 					)
 				}
 				keyed
@@ -101,9 +104,11 @@ export default function () {
 								<Match when={updateStatus()?.type === "done"}>
 									<div class="flex flex-col gap-4 items-center">
 										<p class="text-[--text-tertiary]">
-											Update has been installed. Restart Cap to finish updating.
+											{t("update.installed.restartToFinish")}
 										</p>
-										<Button onClick={() => relaunch()}>Restart Now</Button>
+										<Button onClick={() => relaunch()}>
+											{t("update.button.restartNow")}
+										</Button>
 									</div>
 								</Match>
 								<Match
@@ -120,7 +125,7 @@ export default function () {
 									{(status) => (
 										<>
 											<h1 class="text-[--text-primary] mb-4">
-												Installing Update
+												{t("update.installingTitle")}
 											</h1>
 
 											<div class="w-full bg-gray-3 rounded-full h-2.5">

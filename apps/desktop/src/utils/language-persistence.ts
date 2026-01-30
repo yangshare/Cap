@@ -2,14 +2,13 @@ import { Store } from "@tauri-apps/plugin-store";
 
 import type { Language } from "./language-detector";
 
-const STORE_PATH = "preferences.json";
 const LANGUAGE_KEY = "language";
 
-let storeInstance: Store | null = null;
+let storeInstance: Promise<Store> | undefined;
 
-async function getStore(): Promise<Store> {
+function getStore(): Promise<Store> {
 	if (!storeInstance) {
-		storeInstance = new Store(STORE_PATH);
+		storeInstance = Store.load("store");
 	}
 	return storeInstance;
 }

@@ -17,6 +17,7 @@ import {
 	Show,
 } from "solid-js";
 import { Input } from "~/routes/editor/ui";
+import { useI18n } from "~/i18n";
 import { trackEvent } from "~/utils/analytics";
 import { createTauriEventListener } from "~/utils/createEventListener";
 import { commands, events, type RecordingMeta } from "~/utils/tauri";
@@ -44,6 +45,7 @@ const screenshotsQuery = queryOptions<Screenshot[]>({
 });
 
 export default function Screenshots() {
+	const t = useI18n();
 	const [search, setSearch] = createSignal("");
 	const trimmedSearch = createMemo(() => search().trim());
 	const normalizedSearch = createMemo(() => trimmedSearch().toLowerCase());
@@ -79,10 +81,11 @@ export default function Screenshots() {
 		() => !normalizedSearch() && filteredScreenshots().length > visibleCount(),
 	);
 
-	const emptyMessage = createMemo(() => {
-		const prefix = trimmedSearch() ? "No matching" : "No";
-		return `${prefix} screenshots`;
-	});
+	const emptyMessage = createMemo(() =>
+		trimmedSearch()
+			? t("settings.screenshots.empty.search")
+			: t("settings.screenshots.empty"),
+	);
 
 	const handleScreenshotClick = (screenshot: Screenshot) => {
 		trackEvent("screenshot_view_clicked");
@@ -116,16 +119,18 @@ export default function Screenshots() {
 	return (
 		<div class="flex relative flex-col p-4 space-y-4 w-full h-full">
 			<div class="flex flex-col">
-				<h2 class="text-lg font-medium text-gray-12">Screenshots</h2>
+				<h2 class="text-lg font-medium text-gray-12">
+					{t("settings.sidebar.screenshots")}
+				</h2>
 				<p class="text-sm text-gray-10">
-					Manage your screenshots and perform actions.
+					{t("settings.screenshots.description")}
 				</p>
 			</div>
 			<Show
 				when={screenshots.data && screenshots.data.length > 0}
 				fallback={
 					<p class="text-center text-[--text-tertiary] absolute flex items-center justify-center w-full h-full">
-						No screenshots found
+						{t("settings.screenshots.empty")}
 					</p>
 				}
 			>
@@ -143,12 +148,12 @@ export default function Screenshots() {
 									setSearch("");
 								}
 							}}
-							placeholder="Search screenshots"
+							placeholder={t("settings.screenshots.searchPlaceholder")}
 							autoCapitalize="off"
 							autocorrect="off"
 							autocomplete="off"
 							spellcheck={false}
-							aria-label="Search screenshots"
+							aria-label={t("settings.screenshots.searchAria")}
 						/>
 					</div>
 				</div>
@@ -185,7 +190,7 @@ export default function Screenshots() {
 									)
 								}
 							>
-								Load more
+								{t("button.loadMore")}
 							</Button>
 						</div>
 					</Show>
@@ -217,7 +222,7 @@ function ScreenshotItem(props: {
 				>
 					<img
 						class="object-cover rounded size-12"
-						alt="Screenshot thumbnail"
+						alt={t("settings.screenshots.thumbnailAlt")}
 						src={convertFileSrc(props.screenshot.path)}
 						onError={() => setImageExists(false)}
 					/>
@@ -228,31 +233,31 @@ function ScreenshotItem(props: {
 			</div>
 			<div class="flex gap-2 items-center">
 				<TooltipIconButton
-					tooltipText="Open folder"
+					tooltipText={t("settings.screenshots.actions.openFolder")}
 					onClick={props.onOpenFolder}
 				>
 					<IconLucideFolder class="size-4" />
 				</TooltipIconButton>
 
 				<TooltipIconButton
-					tooltipText="Open in editor"
+					tooltipText={t("settings.screenshots.actions.openEditor")}
 					onClick={props.onOpenEditor}
 				>
 					<IconLucideEdit class="size-4" />
 				</TooltipIconButton>
 
 				<TooltipIconButton
-					tooltipText="Copy image"
+					tooltipText={t("settings.screenshots.actions.copyImage")}
 					onClick={props.onCopyImageToClipboard}
 				>
 					<IconLucideCopy class="size-4" />
 				</TooltipIconButton>
 
 				<TooltipIconButton
-					tooltipText="Delete"
+					tooltipText={t("button.delete")}
 					onClick={async () => {
 						if (
-							!(await ask("Are you sure you want to delete this screenshot?"))
+							!(await ask(t("settings.screenshots.deleteConfirm")))
 						)
 							return;
 						// screenshot.path is the png file. Parent is the .cap folder.

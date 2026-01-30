@@ -43,6 +43,7 @@ import {
 import ModeSelect from "~/components/ModeSelect";
 import SelectionHint from "~/components/selection-hint";
 import { authStore, generalSettingsStore } from "~/store";
+import { useI18n } from "~/i18n";
 import { createDevicesQuery } from "~/utils/devices";
 import {
 	createCameraMutation,
@@ -1125,6 +1126,7 @@ function RecordingControls(props: {
 	disabled?: boolean;
 	onRecordingStart?: () => void;
 }) {
+	const t = useI18n();
 	const auth = authStore.createQuery();
 	const { setOptions, rawOptions } = useRecordingOptions();
 
@@ -1169,11 +1171,18 @@ function RecordingControls(props: {
 		return mics().find((name) => name === rawOptions.micName) ?? null;
 	});
 
+	const modeLabelKey = (mode: string) => {
+		if (mode === "studio") return "main.mode.studio";
+		if (mode === "instant") return "main.mode.instant";
+		if (mode === "screenshot") return "main.mode.screenshot";
+		return "main.mode.studio";
+	};
+
 	const menuModes = async () =>
 		await Menu.new({
 			items: [
 				await CheckMenuItem.new({
-					text: "Studio Mode",
+					text: t("main.mode.studio"),
 					action: () => {
 						setOptions("mode", "studio");
 						commands.setRecordingMode("studio");
@@ -1181,7 +1190,7 @@ function RecordingControls(props: {
 					checked: rawOptions.mode === "studio",
 				}),
 				await CheckMenuItem.new({
-					text: "Instant Mode",
+					text: t("main.mode.instant"),
 					action: () => {
 						setOptions("mode", "instant");
 						commands.setRecordingMode("instant");
@@ -1189,7 +1198,7 @@ function RecordingControls(props: {
 					checked: rawOptions.mode === "instant",
 				}),
 				await CheckMenuItem.new({
-					text: "Screenshot Mode",
+					text: t("main.mode.screenshot"),
 					action: () => {
 						setOptions("mode", "screenshot");
 						commands.setRecordingMode("screenshot");
@@ -1201,24 +1210,24 @@ function RecordingControls(props: {
 
 	const countdownItems = async () => [
 		await CheckMenuItem.new({
-			text: "Off",
+			text: t("settings.recording.countdown.off"),
 			action: () => generalSettingsStore.set({ recordingCountdown: 0 }),
 			checked:
 				!generalSetings.data?.recordingCountdown ||
 				generalSetings.data?.recordingCountdown === 0,
 		}),
 		await CheckMenuItem.new({
-			text: "3 seconds",
+			text: t("settings.recording.countdown.3s"),
 			action: () => generalSettingsStore.set({ recordingCountdown: 3 }),
 			checked: generalSetings.data?.recordingCountdown === 3,
 		}),
 		await CheckMenuItem.new({
-			text: "5 seconds",
+			text: t("settings.recording.countdown.5s"),
 			action: () => generalSettingsStore.set({ recordingCountdown: 5 }),
 			checked: generalSetings.data?.recordingCountdown === 5,
 		}),
 		await CheckMenuItem.new({
-			text: "10 seconds",
+			text: t("settings.recording.countdown.10s"),
 			action: () => generalSettingsStore.set({ recordingCountdown: 10 }),
 			checked: generalSetings.data?.recordingCountdown === 10,
 		}),
@@ -1228,7 +1237,7 @@ function RecordingControls(props: {
 		return await Menu.new({
 			items: [
 				await MenuItem.new({
-					text: "Recording Countdown",
+					text: t("settings.recording.countdown"),
 					enabled: false,
 				}),
 				...(await countdownItems()),
@@ -1300,7 +1309,9 @@ function RecordingControls(props: {
 										commands.closeTargetSelectOverlays();
 									} catch (e) {
 										const message = e instanceof Error ? e.message : String(e);
-										toast.error(`Failed to take screenshot: ${message}`);
+										toast.error(
+											t("overlay.error.screenshotFailed", { reason: message }),
+										);
 										console.error("Failed to take screenshot", e);
 									}
 									return;
@@ -1335,14 +1346,14 @@ function RecordingControls(props: {
 									<span class="text-[0.95rem] font-medium text-white text-nowrap">
 										{(() => {
 											if (rawOptions.mode === "instant" && !auth.data)
-												return "Sign In To Use";
+												return t("overlay.action.signInToUse");
 											if (rawOptions.mode === "screenshot")
-												return "Take Screenshot";
-											return "Start Recording";
+												return t("tray.takeScreenshot");
+											return t("recording.button.start");
 										})()}
 									</span>
 									<span class="text-[11px] flex items-center text-nowrap gap-1 transition-opacity duration-200 text-white/90 font-light -mt-0.5">
-										{`${capitalize(rawOptions.mode)} Mode`}
+										{t(modeLabelKey(rawOptions.mode))}
 									</span>
 								</div>
 							</div>
@@ -1402,8 +1413,9 @@ function RecordingControls(props: {
 				>
 					<IconCapInfo class="opacity-70 will-change-transform size-3" />
 					<p class="text-sm text-white drop-shadow-md">
-						<span class="opacity-70">What is </span>
-						<span class="font-medium">{capitalize(rawOptions.mode)} Mode</span>?
+						<span class="opacity-70">{t("overlay.modeInfo.prefix")}</span>
+						<span class="font-medium">{t(modeLabelKey(rawOptions.mode))}</span>
+						{t("overlay.modeInfo.suffix")}
 					</p>
 				</div>
 			</div>
@@ -1412,18 +1424,19 @@ function RecordingControls(props: {
 }
 
 function ShowCapFreeWarning(props: { isInstantMode: boolean }) {
+	const t = useI18n();
 	const auth = authStore.createQuery();
 
 	return (
 		<Suspense>
 			<Show when={props.isInstantMode && auth.data?.plan?.upgraded === false}>
 				<p class="text-sm text-center max-w-64">
-					Instant Mode recordings are limited to 5 mins,{" "}
+					{t("overlay.instantMode.limit", { minutes: 5 })}{" "}
 					<button
 						class="underline"
 						onClick={() => commands.showWindow("Upgrade")}
 					>
-						Upgrade to Pro
+						{t("settings.integrations.button.upgrade")}
 					</button>
 				</p>
 			</Show>

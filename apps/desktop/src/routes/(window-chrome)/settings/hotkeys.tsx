@@ -13,25 +13,14 @@ import {
 import { createStore } from "solid-js/store";
 import { hotkeysStore } from "~/store";
 
+import { useI18n } from "~/i18n";
+
 import {
 	commands,
 	type Hotkey,
 	type HotkeyAction,
 	type HotkeysStore,
 } from "~/utils/tauri";
-
-const ACTION_TEXT = {
-	startStudioRecording: "Start studio recording",
-	startInstantRecording: "Start instant recording",
-	restartRecording: "Restart recording",
-	stopRecording: "Stop recording",
-	togglePauseRecording: "Pause/resume recording",
-	cycleRecordingMode: "Cycle recording mode",
-	openRecordingPicker: "Open recording picker",
-	openRecordingPickerDisplay: "Record display",
-	openRecordingPickerWindow: "Record window",
-	openRecordingPickerArea: "Record area",
-} satisfies { [K in HotkeyAction]?: string };
 
 export default function () {
 	const [store] = createResource(() => hotkeysStore.get());
@@ -45,9 +34,23 @@ export default function () {
 
 const MODIFIER_KEYS = new Set(["Meta", "Shift", "Control", "Alt"]);
 function Inner(props: { initialStore: HotkeysStore | null }) {
+	const t = useI18n();
 	const [hotkeys, setHotkeys] = createStore<{
 		[K in HotkeyAction]?: Hotkey;
 	}>(props.initialStore?.hotkeys ?? {});
+
+	const ACTION_TEXT = {
+		startStudioRecording: t("settings.shortcuts.actions.startStudioRecording"),
+		startInstantRecording: t("settings.shortcuts.actions.startInstantRecording"),
+		restartRecording: t("settings.shortcuts.actions.restartRecording"),
+		stopRecording: t("settings.shortcuts.actions.stopRecording"),
+		togglePauseRecording: t("settings.shortcuts.actions.togglePauseRecording"),
+		cycleRecordingMode: t("settings.shortcuts.actions.cycleRecordingMode"),
+		openRecordingPicker: t("settings.shortcuts.actions.openRecordingPicker"),
+		openRecordingPickerDisplay: t("settings.shortcuts.actions.openRecordingPickerDisplay"),
+		openRecordingPickerWindow: t("settings.shortcuts.actions.openRecordingPickerWindow"),
+		openRecordingPickerArea: t("settings.shortcuts.actions.openRecordingPickerArea"),
+	} satisfies { [K in HotkeyAction]?: string };
 
 	createEffect(() => {
 		hotkeysStore.set({ hotkeys: { ...hotkeys } as any });
@@ -92,9 +95,9 @@ function Inner(props: { initialStore: HotkeysStore | null }) {
 	return (
 		<div class="flex flex-col flex-1 p-4 h-full custom-scroll">
 			<div class="flex flex-col pb-4 border-b border-gray-2">
-				<h2 class="text-lg font-medium text-gray-12">Shortcuts</h2>
+				<h2 class="text-lg font-medium text-gray-12">{t("settings.shortcuts")}</h2>
 				<p class="text-sm text-gray-10 w-full max-w-[500px]">
-					Configure system-wide keyboard shortcuts to control Cap
+					{t("settings.shortcuts.description")}
 				</p>
 			</div>
 			<div class="flex flex-col gap-3 p-4 mt-4 w-full rounded-xl border bg-gray-2 border-gray-3">

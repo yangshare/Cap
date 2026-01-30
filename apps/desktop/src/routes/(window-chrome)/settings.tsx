@@ -10,10 +10,20 @@ import { SignInButton } from "~/components/SignInButton";
 
 import { authStore } from "~/store";
 import { trackEvent } from "~/utils/analytics";
+import { useI18n } from "~/i18n";
+import IconCapSettings from "~icons/cap/settings";
+import IconCapHotkeys from "~icons/cap/hotkeys";
+import IconLucideSquarePlay from "~icons/lucide/square-play";
+import IconLucideImage from "~icons/lucide/image";
+import IconLucideUnplug from "~icons/lucide/unplug";
+import IconLucideGift from "~icons/lucide/gift";
+import IconLucideMessageSquarePlus from "~icons/lucide/message-square-plus";
+import IconLucideBell from "~icons/lucide/bell";
 
 const WINDOW_SIZE = { width: 700, height: 540 } as const;
 
 export default function Settings(props: RouteSectionProps) {
+	const t = useI18n();
 	const auth = authStore.createQuery();
 	const [version] = createResource(() => getVersion());
 
@@ -40,47 +50,47 @@ export default function Settings(props: RouteSectionProps) {
 						each={[
 							{
 								href: "general",
-								name: "General",
+								name: t("settings.general"),
 								icon: IconCapSettings,
 							},
 							{
 								href: "hotkeys",
-								name: "Shortcuts",
+								name: t("settings.sidebar.shortcuts"),
 								icon: IconCapHotkeys,
 							},
 							{
 								href: "recordings",
-								name: "Recordings",
+								name: t("settings.sidebar.recordings"),
 								icon: IconLucideSquarePlay,
 							},
 							{
 								href: "screenshots",
-								name: "Screenshots",
+								name: t("settings.sidebar.screenshots"),
 								icon: IconLucideImage,
 							},
 							{
 								href: "integrations",
-								name: "Integrations",
+								name: t("settings.sidebar.integrations"),
 								icon: IconLucideUnplug,
 							},
 							{
 								href: "license",
-								name: "License",
+								name: t("settings.sidebar.license"),
 								icon: IconLucideGift,
 							},
 							{
 								href: "experimental",
-								name: "Experimental",
+								name: t("settings.sidebar.experimental"),
 								icon: IconCapSettings,
 							},
 							{
 								href: "feedback",
-								name: "Feedback",
+								name: t("settings.sidebar.feedback"),
 								icon: IconLucideMessageSquarePlus,
 							},
 							{
 								href: "changelog",
-								name: "Changelog",
+								name: t("settings.sidebar.changelog"),
 								icon: IconLucideBell,
 							},
 						].filter(Boolean)}
@@ -109,7 +119,7 @@ export default function Settings(props: RouteSectionProps) {
 									class="text-gray-11 hover:text-gray-12 underline transition-colors"
 									onClick={() => shell.open("https://cap.so/download/versions")}
 								>
-									View previous versions
+									{t("settings.version.viewPrevious")}
 								</button>
 							</div>
 						)}
@@ -120,10 +130,10 @@ export default function Settings(props: RouteSectionProps) {
 							variant={auth.data ? "gray" : "dark"}
 							class="w-full"
 						>
-							Sign Out
+							{t("auth.signOut")}
 						</Button>
 					) : (
-						<SignInButton>Sign In</SignInButton>
+						<SignInButton />
 					)}
 				</div>
 			</div>

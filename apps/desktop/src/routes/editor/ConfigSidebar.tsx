@@ -40,6 +40,7 @@ import gradientBg from "~/assets/illustrations/gradient.webp";
 import imageBg from "~/assets/illustrations/image.webp";
 import transparentBg from "~/assets/illustrations/transparent.webp";
 import { Toggle } from "~/components/Toggle";
+import { useI18n } from "~/i18n";
 import { generalSettingsStore } from "~/store";
 import {
 	type BackgroundSource,
@@ -88,10 +89,10 @@ import {
 } from "./ui";
 
 const BACKGROUND_SOURCES = {
-	wallpaper: "Wallpaper",
-	image: "Image",
-	color: "Color",
-	gradient: "Gradient",
+	wallpaper: "editor.config.background.source.wallpaper",
+	image: "editor.config.background.source.image",
+	color: "editor.config.background.source.color",
+	gradient: "editor.config.background.source.gradient",
 } satisfies Record<BackgroundSource["type"], string>;
 
 const BACKGROUND_ICONS = {
@@ -203,21 +204,21 @@ const WALLPAPER_NAMES = [
 ] as const;
 
 const STEREO_MODES = [
-	{ name: "Stereo", value: "stereo" },
-	{ name: "Mono L", value: "monoL" },
-	{ name: "Mono R", value: "monoR" },
-] satisfies Array<{ name: string; value: StereoMode }>;
+	{ labelKey: "editor.config.audio.stereo.stereo", value: "stereo" },
+	{ labelKey: "editor.config.audio.stereo.monoL", value: "monoL" },
+	{ labelKey: "editor.config.audio.stereo.monoR", value: "monoR" },
+] satisfies Array<{ labelKey: string; value: StereoMode }>;
 
 const CAMERA_SHAPES = [
 	{
-		name: "Square",
+		labelKey: "editor.config.camera.shape.square",
 		value: "square",
 	},
 	{
-		name: "Source",
+		labelKey: "editor.config.camera.shape.source",
 		value: "source",
 	},
-] satisfies Array<{ name: string; value: CameraShape }>;
+] satisfies Array<{ labelKey: string; value: CameraShape }>;
 
 const CORNER_STYLE_OPTIONS = [
 	{ name: "Squircle", value: "squircle" },
@@ -225,11 +226,11 @@ const CORNER_STYLE_OPTIONS = [
 ] satisfies Array<{ name: string; value: CornerRoundingType }>;
 
 const BACKGROUND_THEMES = {
-	macOS: "macOS",
-	dark: "Dark",
-	blue: "Blue",
-	purple: "Purple",
-	orange: "Orange",
+	macOS: "editor.config.background.theme.macos",
+	dark: "editor.config.background.theme.dark",
+	blue: "editor.config.background.theme.blue",
+	purple: "editor.config.background.theme.purple",
+	orange: "editor.config.background.theme.orange",
 };
 
 type CursorPresetValues = {
@@ -243,38 +244,38 @@ const DEFAULT_CURSOR_MOTION_BLUR = 0.5;
 const CURSOR_TYPE_OPTIONS = [
 	{
 		value: "auto" as CursorType,
-		label: "Auto",
-		description: "Uses the actual cursor from your recording.",
+		labelKey: "editor.config.cursor.type.auto",
+		descriptionKey: "editor.config.cursor.type.auto.description",
 	},
 	{
 		value: "circle" as CursorType,
-		label: "Circle",
-		description: "A touch-style circle cursor like mobile simulators.",
+		labelKey: "editor.config.cursor.type.circle",
+		descriptionKey: "editor.config.cursor.type.circle.description",
 	},
 ];
 
 const CURSOR_ANIMATION_STYLE_OPTIONS = [
 	{
 		value: "slow",
-		label: "Slow",
-		description: "Relaxed easing with a gentle follow and higher inertia.",
+		labelKey: "editor.config.cursor.motion.slow",
+		descriptionKey: "editor.config.cursor.motion.slow.description",
 		preset: { tension: 65, mass: 1.8, friction: 16 },
 	},
 	{
 		value: "mellow",
-		label: "Mellow",
-		description: "Balanced smoothing for everyday tutorials and walkthroughs.",
+		labelKey: "editor.config.cursor.motion.mellow",
+		descriptionKey: "editor.config.cursor.motion.mellow.description",
 		preset: { tension: 120, mass: 1.1, friction: 18 },
 	},
 	{
 		value: "custom",
-		label: "Custom",
-		description: "Tune tension, friction, and mass manually for full control.",
+		labelKey: "editor.config.cursor.motion.custom",
+		descriptionKey: "editor.config.cursor.motion.custom.description",
 	},
 ] satisfies Array<{
 	value: CursorAnimationStyle;
-	label: string;
-	description: string;
+	labelKey: string;
+	descriptionKey: string;
 	preset?: CursorPresetValues;
 }>;
 
@@ -311,6 +312,7 @@ const TAB_IDS = {
 } as const;
 
 export function ConfigSidebar() {
+	const t = useI18n();
 	const {
 		project,
 		setProject,
@@ -464,21 +466,21 @@ export function ConfigSidebar() {
 					class="flex flex-col flex-1 gap-6 p-4 min-h-0"
 				>
 					<Field
-						name="Audio Controls"
+						name={t("editor.config.audio.controls")}
 						icon={<IconLucideVolume2 class="size-4" />}
 					>
-						<Subfield name="Mute Audio">
+						<Subfield name={t("editor.config.audio.mute")}>
 							<Toggle
 								checked={project.audio.mute}
 								onChange={(v) => setProject("audio", "mute", v)}
 							/>
 						</Subfield>
 						{editorInstance.recordings.segments[0].mic?.channels === 2 && (
-							<Subfield name="Microphone Stereo Mode">
-								<KSelect<{ name: string; value: StereoMode }>
+							<Subfield name={t("editor.config.audio.micStereoMode")}>
+								<KSelect<{ labelKey: string; value: StereoMode }>
 									options={STEREO_MODES}
 									optionValue="value"
-									optionTextValue="name"
+									optionTextValue="value"
 									value={STEREO_MODES.find(
 										(v) => v.value === project.audio.micStereoMode,
 									)}
@@ -492,17 +494,19 @@ export function ConfigSidebar() {
 											item={props.item}
 										>
 											<KSelect.ItemLabel class="flex-1">
-												{props.item.rawValue.name}
+												{t(props.item.rawValue.labelKey)}
 											</KSelect.ItemLabel>
 										</MenuItem>
 									)}
 								>
 									<KSelect.Trigger class="flex flex-row gap-2 items-center px-2 w-full h-8 rounded-lg transition-colors bg-gray-3 disabled:text-gray-11">
 										<KSelect.Value<{
-											name: string;
+											labelKey: string;
 											value: StereoMode;
 										}> class="flex-1 text-sm text-left truncate text-[--gray-500] font-normal">
-											{(state) => <span>{state.selectedOption().name}</span>}
+											{(state) => (
+												<span>{t(state.selectedOption().labelKey)}</span>
+											)}
 										</KSelect.Value>
 										<KSelect.Icon<ValidComponent>
 											as={(props) => (
@@ -543,7 +547,7 @@ export function ConfigSidebar() {
 					</Field>
 					{meta().hasMicrophone && (
 						<Field
-							name="Microphone Volume"
+							name={t("editor.config.audio.microphoneVolume")}
 							icon={<IconCapMicrophone class="size-4" />}
 						>
 							<Slider
@@ -554,14 +558,16 @@ export function ConfigSidebar() {
 								maxValue={10}
 								step={0.1}
 								formatTooltip={(v) =>
-									v <= -30 ? "Muted" : `${v > 0 ? "+" : ""}${v.toFixed(1)} dB`
+									v <= -30
+										? t("editor.config.audio.muted")
+										: `${v > 0 ? "+" : ""}${v.toFixed(1)} dB`
 								}
 							/>
 						</Field>
 					)}
 					{meta().hasSystemAudio && (
 						<Field
-							name="System Audio Volume"
+							name={t("editor.config.audio.systemVolume")}
 							icon={<IconLucideMonitor class="size-4" />}
 						>
 							<Slider
@@ -572,7 +578,9 @@ export function ConfigSidebar() {
 								maxValue={10}
 								step={0.1}
 								formatTooltip={(v) =>
-									v <= -30 ? "Muted" : `${v > 0 ? "+" : ""}${v.toFixed(1)} dB`
+									v <= -30
+										? t("editor.config.audio.muted")
+										: `${v > 0 ? "+" : ""}${v.toFixed(1)} dB`
 								}
 							/>
 						</Field>
@@ -583,7 +591,7 @@ export function ConfigSidebar() {
 					class="flex flex-col flex-1 gap-6 p-4 min-h-0"
 				>
 					<Field
-						name="Cursor"
+						name={t("editor.config.cursor.title")}
 						icon={<IconCapCursor />}
 						value={
 							<Toggle
@@ -595,7 +603,7 @@ export function ConfigSidebar() {
 						}
 					/>
 					<Show when={!project.cursor.hide}>
-						<Field name="Cursor Type" icon={<IconCapCursor />}>
+						<Field name={t("editor.config.cursor.type")} icon={<IconCapCursor />}>
 							<RadioGroup
 								class="flex flex-col gap-2"
 								value={project.cursor.type}
@@ -613,10 +621,10 @@ export function ConfigSidebar() {
 											<RadioGroup.ItemControl class="mt-1 size-4 rounded-full border border-gray-7 ui-checked:border-blue-9 ui-checked:bg-blue-9" />
 											<div class="flex flex-col text-left">
 												<span class="text-sm font-medium text-gray-12">
-													{option.label}
+													{t(option.labelKey)}
 												</span>
 												<span class="text-xs text-gray-11">
-													{option.description}
+													{t(option.descriptionKey)}
 												</span>
 											</div>
 										</RadioGroup.ItemLabel>
@@ -624,7 +632,7 @@ export function ConfigSidebar() {
 								))}
 							</RadioGroup>
 						</Field>
-						<Field name="Size" icon={<IconCapEnlarge />}>
+						<Field name={t("editor.config.cursor.size")} icon={<IconCapEnlarge />}>
 							<Slider
 								value={[project.cursor.size]}
 								onChange={(v) => setProject("cursor", "size", v[0])}
@@ -634,7 +642,7 @@ export function ConfigSidebar() {
 							/>
 						</Field>
 						<Field
-							name="Hide When Idle"
+							name={t("editor.config.cursor.hideWhenIdle")}
 							icon={<IconLucideTimer class="size-4" />}
 							value={
 								<Toggle
@@ -646,7 +654,10 @@ export function ConfigSidebar() {
 							}
 						/>
 						<Show when={project.cursor.hideWhenIdle}>
-							<Subfield name="Inactivity Delay" class="gap-4 items-center">
+							<Subfield
+								name={t("editor.config.cursor.inactivityDelay")}
+								class="gap-4 items-center"
+							>
 								<div class="flex flex-1 gap-3 items-center">
 									<Slider
 										class="flex-1"
@@ -667,7 +678,7 @@ export function ConfigSidebar() {
 							</Subfield>
 						</Show>
 						<Field
-							name="Cursor Movement Style"
+							name={t("editor.config.cursor.movementStyle")}
 							icon={<IconLucideRabbit class="size-4" />}
 						>
 							<RadioGroup
@@ -687,10 +698,10 @@ export function ConfigSidebar() {
 											<RadioGroup.ItemControl class="mt-1 size-4 rounded-full border border-gray-7 ui-checked:border-blue-9 ui-checked:bg-blue-9" />
 											<div class="flex flex-col text-left">
 												<span class="text-sm font-medium text-gray-12">
-													{option.label}
+													{t(option.labelKey)}
 												</span>
 												<span class="text-xs text-gray-11">
-													{option.description}
+													{t(option.descriptionKey)}
 												</span>
 											</div>
 										</RadioGroup.ItemLabel>
@@ -700,7 +711,7 @@ export function ConfigSidebar() {
 						</Field>
 						<KCollapsible open={!project.cursor.raw}>
 							<Field
-								name="Smooth Movement"
+								name={t("editor.config.cursor.smoothMovement")}
 								icon={<IconHugeiconsEaseCurveControlPoints />}
 								value={
 									<Toggle
@@ -714,7 +725,7 @@ export function ConfigSidebar() {
 							<KCollapsible.Content class="overflow-hidden border-b opacity-0 transition-opacity border-gray-3 animate-collapsible-up ui-expanded:animate-collapsible-down ui-expanded:opacity-100">
 								{/* if Content has padding or margin the animation doesn't look as good */}
 								<div class="flex flex-col gap-4 pt-4 pb-6">
-									<Field name="Tension">
+									<Field name={t("editor.config.cursor.tension")}>
 										<Slider
 											value={[project.cursor.tension]}
 											onChange={(v) => setCursorPhysics("tension", v[0])}
@@ -723,7 +734,7 @@ export function ConfigSidebar() {
 											step={1}
 										/>
 									</Field>
-									<Field name="Friction">
+									<Field name={t("editor.config.cursor.friction")}>
 										<Slider
 											value={[project.cursor.friction]}
 											onChange={(v) => setCursorPhysics("friction", v[0])}
@@ -732,7 +743,7 @@ export function ConfigSidebar() {
 											step={0.1}
 										/>
 									</Field>
-									<Field name="Mass">
+									<Field name={t("editor.config.cursor.mass")}>
 										<Slider
 											value={[project.cursor.mass]}
 											onChange={(v) => setCursorPhysics("mass", v[0])}
@@ -1195,6 +1206,7 @@ export function ConfigSidebar() {
 
 function BackgroundConfig(props: { scrollRef: HTMLDivElement }) {
 	const { project, setProject, projectHistory } = useEditorContext();
+	const t = useI18n();
 
 	// Background tabs
 	const [backgroundTab, setBackgroundTab] =
@@ -1508,7 +1520,7 @@ function BackgroundConfig(props: { scrollRef: HTMLDivElement }) {
 													return (
 														<img
 															loading="eager"
-															alt={BACKGROUND_SOURCES[item]}
+															alt={t(BACKGROUND_SOURCES[item])}
 															class="size-3.5 rounded"
 															src={imageSrc}
 														/>
@@ -1527,7 +1539,7 @@ function BackgroundConfig(props: { scrollRef: HTMLDivElement }) {
 														return null;
 												}
 											})()}
-											{BACKGROUND_SOURCES[item]}
+											{t(BACKGROUND_SOURCES[item])}
 										</div>
 									</KTabs.Trigger>
 								);
@@ -1570,7 +1582,7 @@ function BackgroundConfig(props: { scrollRef: HTMLDivElement }) {
 												value={key}
 												class="flex relative z-10 flex-1 justify-center items-center px-4 py-2 bg-transparent rounded-lg border transition-colors duration-200 text-gray-11 ui-not-selected:hover:border-gray-7 ui-selected:bg-gray-3 ui-selected:border-gray-3 group ui-selected:text-gray-12 disabled:opacity-50 focus:outline-none"
 											>
-												{value}
+												{t(value)}
 											</KTabs.Trigger>
 										</>
 									)}
@@ -2191,6 +2203,7 @@ function BackgroundConfig(props: { scrollRef: HTMLDivElement }) {
 
 function CameraConfig(props: { scrollRef: HTMLDivElement }) {
 	const { project, setProject } = useEditorContext();
+	const t = useI18n();
 
 	return (
 		<KTabs.Content
@@ -2240,23 +2253,23 @@ function CameraConfig(props: { scrollRef: HTMLDivElement }) {
 							</For>
 						</KRadioGroup>
 					</div>
-					<Subfield name="Hide Camera">
+					<Subfield name={t("editor.config.camera.hide")}>
 						<Toggle
 							checked={project.camera.hide}
 							onChange={(hide) => setProject("camera", "hide", hide)}
 						/>
 					</Subfield>
-					<Subfield name="Mirror Camera">
+					<Subfield name={t("editor.config.camera.mirror")}>
 						<Toggle
 							checked={project.camera.mirror}
 							onChange={(mirror) => setProject("camera", "mirror", mirror)}
 						/>
 					</Subfield>
-					<Subfield name="Shape">
-						<KSelect<{ name: string; value: CameraShape }>
+					<Subfield name={t("editor.config.camera.shape")}>
+						<KSelect<{ labelKey: string; value: CameraShape }>
 							options={CAMERA_SHAPES}
 							optionValue="value"
-							optionTextValue="name"
+							optionTextValue="value"
 							value={CAMERA_SHAPES.find(
 								(v) => v.value === project.camera.shape,
 							)}
@@ -2270,17 +2283,19 @@ function CameraConfig(props: { scrollRef: HTMLDivElement }) {
 									item={props.item}
 								>
 									<KSelect.ItemLabel class="flex-1">
-										{props.item.rawValue.name}
+										{t(props.item.rawValue.labelKey)}
 									</KSelect.ItemLabel>
 								</MenuItem>
 							)}
 						>
 							<KSelect.Trigger class="flex flex-row gap-2 items-center px-2 w-full h-8 rounded-lg transition-colors bg-gray-3 disabled:text-gray-11">
 								<KSelect.Value<{
-									name: string;
-									value: StereoMode;
+									labelKey: string;
+									value: CameraShape;
 								}> class="flex-1 text-sm text-left truncate text-[--gray-500] font-normal">
-									{(state) => <span>{state.selectedOption().name}</span>}
+									{(state) => (
+										<span>{t(state.selectedOption().labelKey)}</span>
+									)}
 								</KSelect.Value>
 								<KSelect.Icon<ValidComponent>
 									as={(props) => (

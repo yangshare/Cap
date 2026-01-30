@@ -4,6 +4,7 @@ import { createWritableMemo } from "@solid-primitives/memo";
 import { useMutation } from "@tanstack/solid-query";
 import { createResource, Suspense } from "solid-js";
 import { Input } from "~/routes/editor/ui";
+import { useI18n } from "~/i18n";
 import { commands } from "~/utils/tauri";
 import { apiClient, protectedHeaders } from "~/utils/web-api";
 
@@ -26,6 +27,7 @@ const DEFAULT_CONFIG = {
 };
 
 export default function S3ConfigPage() {
+	const t = useI18n();
 	const [_s3Config, { refetch }] = createResource(async () => {
 		const response = await apiClient.desktop.getS3Config({
 			headers: await protectedHeaders(),
@@ -50,7 +52,7 @@ export default function S3ConfigPage() {
 		},
 		onSuccess: async () => {
 			await refetch();
-			await commands.globalMessageDialog("S3 configuration saved successfully");
+			await commands.globalMessageDialog(t("settings.integrations.s3Config.saved"));
 		},
 	}));
 
@@ -67,7 +69,7 @@ export default function S3ConfigPage() {
 		onSuccess: async () => {
 			await refetch();
 			await commands.globalMessageDialog(
-				"S3 configuration deleted successfully",
+				t("settings.integrations.s3Config.deleted"),
 			);
 		},
 	}));
@@ -88,7 +90,7 @@ export default function S3ConfigPage() {
 
 				if (response.status !== 200)
 					throw new Error(
-						`S3 connection test failed. Check your config and network connection.`,
+						t("settings.integrations.s3Config.testFailed"),
 					);
 
 				return response;
@@ -98,7 +100,7 @@ export default function S3ConfigPage() {
 				if (error instanceof Error) {
 					if (error.name === "AbortError")
 						throw new Error(
-							"Connection test timed out after 5 seconds. Please check your endpoint URL and network connection.",
+							t("settings.integrations.s3Config.testTimeout"),
 						);
 				}
 
@@ -107,7 +109,7 @@ export default function S3ConfigPage() {
 		},
 		onSuccess: async () => {
 			await commands.globalMessageDialog(
-				"S3 configuration test successful! Connection is working.",
+				t("settings.integrations.s3Config.testSuccess"),
 			);
 		},
 	}));
@@ -168,23 +170,22 @@ export default function S3ConfigPage() {
 								<div class="p-4 space-y-4 animate-in fade-in">
 									<div class="pb-4 border-b border-gray-3">
 										<p class="text-sm text-gray-11">
-											It should take under 10 minutes to set up and connect your
-											storage bucket to Cap. View the{" "}
+											{t("settings.integrations.s3Config.guidePrefix")}{" "}
 											<a
 												href="https://cap.so/docs/s3-config"
 												target="_blank"
 												class="underline text-gray-12"
 												rel="noopener"
 											>
-												Storage Config Guide
-											</a>{" "}
-											to get started.
+												{t("settings.integrations.s3Config.guideLink")}
+											</a>
+											{t("settings.integrations.s3Config.guideSuffix")}
 										</p>
 									</div>
 
 									<div class="space-y-2">
 										<label class="text-[13px] text-gray-12">
-											Storage Provider
+											{t("settings.integrations.s3Config.storageProvider")}
 										</label>
 										<div class="relative">
 											<select
@@ -201,7 +202,9 @@ export default function S3ConfigPage() {
 												<option value="cloudflare">Cloudflare R2</option>
 												<option value="supabase">Supabase</option>
 												<option value="minio">MinIO</option>
-												<option value="other">Other S3-Compatible</option>
+												<option value="other">
+													{t("settings.integrations.s3Config.providers.other")}
+												</option>
 											</select>
 											<div class="flex absolute inset-y-0 right-0 items-center px-2 pointer-events-none">
 												<svg
@@ -221,24 +224,32 @@ export default function S3ConfigPage() {
 									</div>
 
 									{renderInput(
-										"Access Key ID",
+										t("settings.integrations.s3Config.accessKeyId"),
 										"accessKeyId",
 										"PL31OADSQNK",
 										"password",
 									)}
 									{renderInput(
-										"Secret Access Key",
+										t("settings.integrations.s3Config.secretAccessKey"),
 										"secretAccessKey",
 										"PL31OADSQNK",
 										"password",
 									)}
 									{renderInput(
-										"Endpoint",
+										t("settings.integrations.s3Config.endpoint"),
 										"endpoint",
 										"https://s3.amazonaws.com",
 									)}
-									{renderInput("Bucket Name", "bucketName", "my-bucket")}
-									{renderInput("Region", "region", "us-east-1")}
+									{renderInput(
+										t("settings.integrations.s3Config.bucketName"),
+										"bucketName",
+										"my-bucket",
+									)}
+									{renderInput(
+										t("settings.integrations.s3Config.region"),
+										"region",
+										"us-east-1",
+									)}
 								</div>
 							);
 						})()}
@@ -261,11 +272,15 @@ export default function S3ConfigPage() {
 								variant="destructive"
 								onClick={() => deleteConfig.mutate()}
 							>
-								{deleteConfig.isPending ? "Removing..." : "Remove Config"}
+								{deleteConfig.isPending
+									? t("settings.integrations.s3Config.removing")
+									: t("settings.integrations.s3Config.remove")}
 							</Button>
 						)}
 						<Button variant="gray" onClick={() => events.emit("test")}>
-							{testConfig.isPending ? "Testing..." : "Test Connection"}
+							{testConfig.isPending
+								? t("settings.integrations.s3Config.testing")
+								: t("settings.integrations.s3Config.testConnection")}
 						</Button>
 					</div>
 					<Button
@@ -273,7 +288,9 @@ export default function S3ConfigPage() {
 						variant="primary"
 						onClick={() => events.emit("save")}
 					>
-						{saveConfig.isPending ? "Saving..." : "Save"}
+						{saveConfig.isPending
+							? t("settings.integrations.s3Config.saving")
+							: t("button.save")}
 					</Button>
 				</fieldset>
 			</div>

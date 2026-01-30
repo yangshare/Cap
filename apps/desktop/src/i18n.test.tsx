@@ -1,6 +1,6 @@
 import { render } from "@solidjs/testing-library";
-import { beforeEach, describe, expect, it } from "vitest";
-import { type I18nProvider, i18n, useI18n } from "./i18n";
+import { describe, expect, it, vi } from "vitest";
+import { I18nProvider, i18n, useI18n } from "./i18n";
 
 describe("i18n", () => {
 	describe("initialization", () => {
@@ -69,7 +69,7 @@ describe("i18n", () => {
 					const t = useI18n();
 					expect(t("recording.button.start")).toBe("Start Recording");
 					expect(t("settings.language.description")).toBe(
-						"Choose your preferred language"
+						"Choose your preferred language",
 					);
 					return null;
 				};

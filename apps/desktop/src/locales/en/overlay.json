@@ -1,0 +1,7 @@
+{
+	"overlay.action.signInToUse": "Sign In To Use",
+	"overlay.error.screenshotFailed": "Failed to take screenshot: {{reason}}",
+	"overlay.modeInfo.prefix": "What is ",
+	"overlay.modeInfo.suffix": "?",
+	"overlay.instantMode.limit": "Instant Mode recordings are limited to {{minutes}} mins,"
+}

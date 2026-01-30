@@ -26,6 +26,7 @@ import CapTooltip from "~/components/Tooltip";
 import { Input } from "~/routes/editor/ui";
 import { trackEvent } from "~/utils/analytics";
 import { createTauriEventListener } from "~/utils/createEventListener";
+import { useI18n } from "~/i18n";
 import {
 	commands,
 	events,
@@ -41,63 +42,25 @@ type Recording = {
 	thumbnailPath: string;
 };
 
-const Tabs = [
-	{
-		id: "all",
-		label: "Show all",
-	},
-	{
-		id: "instant",
-		icon: <IconCapInstant class="invert size-3 dark:invert-0" />,
-		label: "Instant",
-	},
-	{
-		id: "studio",
-		icon: <IconCapFilmCut class="invert size-3 dark:invert-0" />,
-		label: "Studio",
-	},
-] satisfies { id: string; label: string; icon?: JSX.Element }[];
-
-const PAGE_SIZE = 20;
-
-const hasActiveRecording = (recording: Recording) => {
-	const status = recording.meta.status.status;
-	if (status === "InProgress" || status === "NeedsRemux") return true;
-	const uploadState = recording.meta.upload?.state;
-	return (
-		uploadState === "MultipartUpload" || uploadState === "SinglePartUpload"
-	);
-};
-
-const recordingsQuery = queryOptions<Recording[]>({
-	queryKey: ["recordings"],
-	queryFn: async () => {
-		const result = await commands.listRecordings().catch(() => [] as const);
-
-		const recordings = await Promise.all(
-			result.map(async (file) => {
-				const [path, meta] = file;
-				const thumbnailPath = `${path}/screenshots/display.jpg`;
-
-				return {
-					meta,
-					path,
-					prettyName: meta.pretty_name,
-					thumbnailPath,
-				};
-			}),
-		);
-		return recordings;
-	},
-	reconcile: "path",
-	refetchInterval: (query) => {
-		const data = query.state.data;
-		if (!data) return false;
-		return data.some(hasActiveRecording) ? 2000 : false;
-	},
-});
-
 export default function Recordings() {
+	const t = useI18n();
+	const Tabs = [
+		{
+			id: "all",
+			label: t("settings.recordings.tabs.all"),
+		},
+		{
+			id: "instant",
+			icon: <IconCapInstant class="invert size-3 dark:invert-0" />,
+			label: t("settings.recordings.tabs.instant"),
+		},
+		{
+			id: "studio",
+			icon: <IconCapFilmCut class="invert size-3 dark:invert-0" />,
+			label: t("settings.recordings.tabs.studio"),
+		},
+	] satisfies { id: string; label: string; icon?: JSX.Element }[];
+
 	const [activeTab, setActiveTab] = createSignal<(typeof Tabs)[number]["id"]>(
 		Tabs[0].id,
 	);
@@ -156,10 +119,10 @@ export default function Recordings() {
 	);
 
 	const emptyMessage = createMemo(() => {
-		const tabLabel =
-			activeTab() === "all" ? "recordings" : `${activeTab()} recordings`;
-		const prefix = trimmedSearch() ? "No matching" : "No";
-		return `${prefix} ${tabLabel}`;
+		const tab = Tabs.find((t) => t.id === activeTab());
+		const tabLabel = tab?.label || activeTab();
+		const prefix = trimmedSearch() ? t("settings.recordings.empty.search") : t("settings.recordings.empty.default");
+		return `${prefix} (${tabLabel})`;
 	});
 
 	const handleRecordingClick = (recording: Recording) => {
@@ -187,16 +150,16 @@ export default function Recordings() {
 	return (
 		<div class="flex relative flex-col p-4 space-y-4 w-full h-full">
 			<div class="flex flex-col">
-				<h2 class="text-lg font-medium text-gray-12">Recordings</h2>
+				<h2 class="text-lg font-medium text-gray-12">{t("settings.recordings.title")}</h2>
 				<p class="text-sm text-gray-10">
-					Manage your recordings and perform actions.
+					{t("settings.recordings.description")}
 				</p>
 			</div>
 			<Show
 				when={recordings.data && recordings.data.length > 0}
 				fallback={
 					<p class="text-center text-[--text-tertiary] absolute flex items-center justify-center w-full h-full">
-						No recordings found
+						{t("settings.recordings.empty.default")}
 					</p>
 				}
 			>
@@ -232,7 +195,7 @@ export default function Recordings() {
 									setSearch("");
 								}
 							}}
-							placeholder="Search recordings"
+							placeholder={t("settings.recordings.searchPlaceholder")}
 							autoCapitalize="off"
 							autocorrect="off"
 							autocomplete="off"

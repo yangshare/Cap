@@ -2,6 +2,7 @@ import { Button } from "@cap/ui-solid";
 import { createMutation } from "@tanstack/solid-query";
 import { createSignal, onMount, Show } from "solid-js";
 import { commands, type IncompleteRecordingInfo } from "~/utils/tauri";
+import { useI18n } from "~/i18n";
 
 function formatDuration(secs: number): string {
 	if (secs < 60) {
@@ -18,6 +19,7 @@ function formatDuration(secs: number): string {
 const RECOVERY_CHECK_DELAY_MS = 2000;
 
 export function RecoveryToast() {
+	const t = useI18n();
 	const [incompleteRecordings, setIncompleteRecordings] = createSignal<
 		IncompleteRecordingInfo[] | null
 	>(null);
@@ -109,7 +111,7 @@ export function RecoveryToast() {
 								variant="primary"
 								size="xs"
 							>
-								{recoverMutation.isPending ? "..." : "Recover"}
+								{recoverMutation.isPending ? "..." : t("recovery.toast.recover")}
 							</Button>
 							<Button
 								onClick={() => discardMutation.mutate(rec().projectPath)}
@@ -117,7 +119,7 @@ export function RecoveryToast() {
 								variant="gray"
 								size="xs"
 							>
-								Discard
+								{t("recovery.toast.discard")}
 							</Button>
 						</div>
 					</div>

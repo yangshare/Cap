@@ -19,6 +19,7 @@ import {
 	type ValidComponent,
 } from "solid-js";
 import Tooltip from "~/components/Tooltip";
+import { useI18n } from "~/i18n";
 import { useEditorContext } from "./context";
 import { TextInput } from "./TextInput";
 
@@ -190,9 +191,10 @@ export const Dialog = {
 		);
 	},
 	CloseButton() {
+		const t = useI18n();
 		return (
 			<KDialog.CloseButton as={Button} variant="gray">
-				Cancel
+				{t("button.cancel")}
 			</KDialog.CloseButton>
 		);
 	},

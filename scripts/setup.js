@@ -21,7 +21,8 @@ const arch =
 	(process.arch === "arm64" ? "aarch64" : "x86_64");
 
 const BASE_CARGO_TOML = `[env]
-FFMPEG_DIR = { relative = true, force = true, value = "target/native-deps" }
+FFMPEG_DIR = "E:\\\\\\\\开源项目\\\\\\\\录屏软件\\\\\\\\Cap\\\\\\\\target\\\\\\\\native-deps"
+VCPKGRS_NO_SYSTEM = "1"
 `;
 
 async function main() {
@@ -150,21 +151,20 @@ async function main() {
 		);
 		console.log("Copied ffmpeg/lib and ffmpeg/include to target/native-deps");
 
-		const { stdout: vcInstallDir } = await exec(
-			// biome-ignore lint/suspicious/noTemplateCurlyInString: PowerShell syntax, not JS template literal
+		const { stdout: vsInstallDir } = await exec(
 			'$(& "${env:ProgramFiles(x86)}/Microsoft Visual Studio/Installer/vswhere.exe" -latest -property installationPath)',
 			{ shell: "powershell.exe" },
 		);
 
-		const libclangPath = path.join(
-			vcInstallDir.trim(),
-			"VC/Tools/LLVM/x64/bin/libclang.dll",
-		);
+		const libclangPath = "C:\\Program Files\\LLVM\\bin\\libclang.dll";
+		const libclangExists = await fileExists(libclangPath);
 
-		cargoConfigContents += `LIBCLANG_PATH = "${libclangPath.replaceAll(
-			"\\",
-			"/",
-		)}"\n`;
+		if (libclangExists) {
+			cargoConfigContents += `LIBCLANG_PATH = "${libclangPath.replaceAll(
+				"\\",
+				"\\\\",
+			)}"\n`;
+		}
 	}
 
 	await fs.mkdir(path.join(__root, ".cargo"), { recursive: true });
