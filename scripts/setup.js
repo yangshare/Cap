@@ -123,10 +123,18 @@ async function main() {
 		// alternative to adding ffmpeg/bin to PATH
 		await fs.mkdir(path.join(targetDir, "debug"), { recursive: true });
 		for (const name of await fs.readdir(path.join(ffmpegDir, "bin"))) {
-			await fs.copyFile(
-				path.join(ffmpegDir, "bin", name),
-				path.join(targetDir, "debug", name),
-			);
+			try {
+				await fs.copyFile(
+					path.join(ffmpegDir, "bin", name),
+					path.join(targetDir, "debug", name),
+				);
+			} catch (error) {
+				if (error && typeof error === "object" && "code" in error) {
+					const code = error.code;
+					if (code === "EBUSY" || code === "EPERM") continue;
+				}
+				throw error;
+			}
 		}
 		console.log("Copied ffmpeg dylibs to target/debug");
 

@@ -57,6 +57,7 @@
 		"@types/react-tooltip": "^4.2.4",
 		"cva": "npm:class-variance-authority@^0.7.0",
 		"effect": "^3.18.4",
+		"debug": "^4.4.3",
 		"lz4-wasm": "^0.9.2",
 		"mp4box": "^0.5.2",
 		"posthog-js": "^1.215.3",

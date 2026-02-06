@@ -21,6 +21,7 @@ import { useI18n } from "~/i18n";
 import { trackEvent } from "~/utils/analytics";
 import { createTauriEventListener } from "~/utils/createEventListener";
 import { commands, events, type RecordingMeta } from "~/utils/tauri";
+import { PAGE_SIZE } from "./pagination";
 
 // Icons
 import IconCapTrash from "~icons/cap/trash";
@@ -32,8 +33,6 @@ import IconLucideSearch from "~icons/lucide/search";
 type Screenshot = RecordingMeta & {
 	path: string;
 };
-
-const PAGE_SIZE = 20;
 
 const screenshotsQuery = queryOptions<Screenshot[]>({
 	queryKey: ["screenshots"],

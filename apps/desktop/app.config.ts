@@ -1,5 +1,6 @@
 import capUIPlugin from "@cap/ui-solid/vite";
 import { defineConfig } from "@solidjs/start/config";
+import { fileURLToPath } from "node:url";
 import topLevelAwait from "vite-plugin-top-level-await";
 import wasm from "vite-plugin-wasm";
 import tsconfigPaths from "vite-tsconfig-paths";
@@ -37,6 +38,18 @@ export default defineConfig({
 		define: {
 			"import.meta.vitest": "undefined",
 		},
+		resolve: {
+			alias: {
+				debug: fileURLToPath(new URL("./src/shims/debug.ts", import.meta.url)),
+				"debug/src/browser.js": fileURLToPath(
+					new URL("./src/shims/debug.ts", import.meta.url),
+				),
+				extend: fileURLToPath(new URL("./src/shims/extend.ts", import.meta.url)),
+				"extend/index.js": fileURLToPath(
+					new URL("./src/shims/extend.ts", import.meta.url),
+				),
+			},
+		},
 		optimizeDeps: {
 			include: [
 				"@tauri-apps/plugin-os",
@@ -51,7 +64,10 @@ export default defineConfig({
 				"@tauri-apps/api/core",
 				"@tauri-apps/api/event",
 				"cva",
+				"debug",
+				"extend",
 			],
+			needsInterop: ["debug", "extend"],
 		},
 	}),
 });

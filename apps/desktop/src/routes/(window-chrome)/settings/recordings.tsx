@@ -27,6 +27,7 @@ import { Input } from "~/routes/editor/ui";
 import { trackEvent } from "~/utils/analytics";
 import { createTauriEventListener } from "~/utils/createEventListener";
 import { useI18n } from "~/i18n";
+import { PAGE_SIZE } from "./pagination";
 import {
 	commands,
 	events,
@@ -41,6 +42,27 @@ type Recording = {
 	prettyName: string;
 	thumbnailPath: string;
 };
+
+function joinFsPath(base: string, ...parts: string[]) {
+	const sep = base.includes("\\") ? "\\" : "/";
+	const trimmedBase = base.replace(/[\\/]+$/, "");
+	const cleanedParts = parts.map((p) => p.replace(/^[\\/]+|[\\/]+$/g, ""));
+	return [trimmedBase, ...cleanedParts].join(sep);
+}
+
+const recordingsQuery = queryOptions<Recording[]>({
+	queryKey: ["recordings"] as const,
+	queryFn: async () => {
+		const result = await commands.listRecordings().catch(() => [] as const);
+		return result.map(([path, meta]) => ({
+			meta,
+			path,
+			prettyName: meta.pretty_name,
+			thumbnailPath: joinFsPath(path, "screenshots", "display.jpg"),
+		}));
+	},
+	reconcile: "path",
+});
 
 export default function Recordings() {
 	const t = useI18n();
