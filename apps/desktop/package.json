@@ -56,8 +56,8 @@
 		"@ts-rest/core": "^3.52.1",
 		"@types/react-tooltip": "^4.2.4",
 		"cva": "npm:class-variance-authority@^0.7.0",
-		"effect": "^3.18.4",
 		"debug": "^4.4.3",
+		"effect": "^3.18.4",
 		"lz4-wasm": "^0.9.2",
 		"mp4box": "^0.5.2",
 		"posthog-js": "^1.215.3",
@@ -76,6 +76,7 @@
 	"devDependencies": {
 		"@fontsource/geist-sans": "^5.0.3",
 		"@iconify/json": "^2.2.239",
+		"@solidjs/testing-library": "^0.8.10",
 		"@tauri-apps/cli": ">=2.1.0",
 		"@total-typescript/ts-reset": "^0.6.1",
 		"@types/dom-webcodecs": "^0.1.11",

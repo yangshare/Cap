@@ -1,6 +1,7 @@
 use std::env;
 
 #[tauri::command]
+#[specta::specta]
 pub async fn get_system_language() -> Result<String, String> {
     let system_lang = detect_system_language();
     Ok(system_lang)
@@ -28,20 +29,30 @@ fn detect_windows_language() -> String {
     use winreg::enums::HKEY_CURRENT_USER;
     use winreg::RegKey;
 
-    let hklm = RegKey::preopen(HKEY_CURRENT_USER, r"Control Panel\Desktop")
-        .map_err(|e| format!("Failed to open registry: {e}"));
+    fn read_preferred_languages(key: &RegKey) -> Option<String> {
+        if let Ok(langs) = key.get_value::<Vec<String>, _>("PreferredUILanguages") {
+            if let Some(lang) = langs.into_iter().next() {
+                return Some(lang);
+            }
+        }
 
-    if let Ok(key) = hklm {
-        if let Ok(lang) = key.get_value::<String>("PreferredUILanguages") {
+        if let Ok(lang) = key.get_value::<String, _>("PreferredUILanguages") {
+            return Some(lang);
+        }
+
+        None
+    }
+
+    let hkcu = RegKey::predef(HKEY_CURRENT_USER);
+
+    if let Ok(key) = hkcu.open_subkey(r"Control Panel\Desktop") {
+        if let Some(lang) = read_preferred_languages(&key) {
             return map_language_code(&lang);
         }
     }
 
-    let hkcu = RegKey::preopen(HKEY_CURRENT_USER, r"Control Panel\Desktop\MuiCached")
-        .map_err(|e| format!("Failed to open registry: {e}"));
-
-    if let Ok(key) = hkcu {
-        if let Ok(lang) = key.get_value::<String>("PreferredUILanguages") {
+    if let Ok(key) = hkcu.open_subkey(r"Control Panel\Desktop\MuiCached") {
+        if let Some(lang) = read_preferred_languages(&key) {
             return map_language_code(&lang);
         }
     }

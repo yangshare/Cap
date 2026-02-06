@@ -1,11 +1,11 @@
 import { loadLanguage } from "./language-persistence";
-import { commands } from "./tauri";
+import { invoke } from "@tauri-apps/api/core";
 
 export type Language = "en" | "zh-CN";
 
 export async function detectSystemLanguage(): Promise<Language> {
 	try {
-		const systemLang = await commands.getSystemLanguage();
+		const systemLang = await invoke<string>("get_system_language");
 
 		if (systemLang.startsWith("zh")) {
 			return "zh-CN";

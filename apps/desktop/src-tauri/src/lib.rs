@@ -17,6 +17,7 @@ mod general_settings;
 mod hotkeys;
 mod http_client;
 mod import;
+mod language;
 mod logging;
 mod notifications;
 mod permissions;
@@ -2648,6 +2649,7 @@ pub async fn run(recording_logging_handle: LoggingHandle, logs_dir: PathBuf) {
             recording_settings::set_recording_mode,
             upload_logs,
             get_system_diagnostics,
+            language::get_system_language,
             recording::start_recording,
             recording::stop_recording,
             recording::pause_recording,

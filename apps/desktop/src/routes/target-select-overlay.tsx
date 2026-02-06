@@ -42,8 +42,8 @@ import {
 } from "~/components/Cropper";
 import ModeSelect from "~/components/ModeSelect";
 import SelectionHint from "~/components/selection-hint";
-import { authStore, generalSettingsStore } from "~/store";
 import { useI18n } from "~/i18n";
+import { authStore, generalSettingsStore } from "~/store";
 import { createDevicesQuery } from "~/utils/devices";
 import {
 	createCameraMutation,

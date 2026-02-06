@@ -13,12 +13,17 @@ export default function () {
 	);
 
 	const bounds = () => {
-		if (!currentRecording.data) return;
-		if ("window" in currentRecording.data.target) {
-			return currentRecording.data.target.window.bounds;
+		const data = currentRecording.data;
+		if (!data) return;
+
+		const target = data.target;
+		if (!target || typeof target !== "object") return;
+
+		if ("window" in target) {
+			return target.window.bounds ?? undefined;
 		}
-		if ("area" in currentRecording.data.target) {
-			return currentRecording.data.target.area.bounds;
+		if ("area" in target) {
+			return target.area.bounds;
 		}
 	};
 

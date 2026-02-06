@@ -206,6 +206,7 @@ function ScreenshotItem(props: {
 	onOpenFolder: () => void;
 	onCopyImageToClipboard: () => void;
 }) {
+	const t = useI18n();
 	const [imageExists, setImageExists] = createSignal(true);
 	const queryClient = useQueryClient();
 
