@@ -6,6 +6,7 @@ import {
 	createEffect,
 	createSignal,
 } from "solid-js";
+import { useI18n } from "~/i18n";
 import { trackEvent } from "~/utils/analytics";
 import { createCurrentRecordingQuery } from "~/utils/queries";
 import {
@@ -16,8 +17,6 @@ import {
 import InfoPill from "./InfoPill";
 import TargetSelectInfoPill from "./TargetSelectInfoPill";
 import useRequestPermission from "./useRequestPermission";
-
-const NO_CAMERA = "No Camera";
 
 export default function CameraSelect(props: {
 	disabled?: boolean;
@@ -50,6 +49,7 @@ export function CameraSelectBase(props: {
 	permissions?: OSPermissionsCheck;
 	hidePreviewButton?: boolean;
 }) {
+	const t = useI18n();
 	const currentRecording = createCurrentRecordingQuery();
 	const requestPermission = useRequestPermission();
 	const [cameraWindowOpen, setCameraWindowOpen] = createSignal(false);
@@ -121,7 +121,7 @@ export function CameraSelectBase(props: {
 
 					Promise.all([
 						CheckMenuItem.new({
-							text: NO_CAMERA,
+							text: t("main.device.noCamera"),
 							checked: props.value === null,
 							action: () => onChange(null),
 						}),
@@ -143,7 +143,7 @@ export function CameraSelectBase(props: {
 			>
 				<IconCapCamera class={props.iconClass} />
 				<p class="flex-1 text-sm text-left truncate">
-					{props.value?.display_name ?? NO_CAMERA}
+					{props.value?.display_name ?? t("main.device.noCamera")}
 				</p>
 				<div class="flex items-center gap-1">
 					{showHiddenIndicator() && (
@@ -152,7 +152,7 @@ export function CameraSelectBase(props: {
 							onClick={openCameraWindow}
 							onPointerDown={(e) => e.stopPropagation()}
 							class="flex items-center justify-center px-2 py-1 rounded-full bg-gray-6 text-gray-11 hover:bg-gray-7 transition-colors"
-							title="Show camera preview"
+							title={t("main.camera.preview")}
 						>
 							<IconLucideEyeOff class="size-3.5" />
 						</button>

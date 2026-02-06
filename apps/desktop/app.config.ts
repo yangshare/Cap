@@ -49,6 +49,7 @@ export default defineConfig({
 					new URL("./src/shims/extend.ts", import.meta.url),
 				),
 			},
+			dedupe: ["solid-js", "solid-js/web", "solid-js/store"],
 		},
 		optimizeDeps: {
 			include: [
