@@ -1,6 +1,5 @@
 name: "publish"
 
-# change this when ready to release if you want CI/CD
 on:
   workflow_dispatch:
     inputs:
@@ -8,6 +7,9 @@ on:
         description: "Discord Interaction ID"
         required: false
         type: string
+  push:
+    tags:
+      - "cap-v*"
 
 env:
   CN_APPLICATION: cap/cap
@@ -19,8 +21,8 @@ jobs:
   draft:
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.read_version.outputs.value }}
-      needs_release: ${{ steps.create_tag.outputs.tag_existed != 'true' }}
+      version: ${{ steps.resolve_release.outputs.version }}
+      needs_release: ${{ steps.resolve_release.outputs.needs_release }}
       cn_release_stdout: ${{ steps.create_cn_release.outputs.stdout }}
       gh_release_url: ${{ steps.create_gh_release.outputs.url }}
     permissions:
@@ -36,46 +38,66 @@ jobs:
           file: ${{ env.APP_CARGO_TOML }}
           field: "package.version"
 
-      - name: Create tag
-        id: create_tag
-        if: ${{ steps.create_tag.outputs.tag_existed != 'true' }}
+      - name: Resolve release metadata
+        id: resolve_release
         uses: actions/github-script@v7
         with:
           script: |
-            const tag = "cap-v${{ steps.read_version.outputs.value }}";
-            const tagRef = `tags/${tag}`;
+            const versionFromCargo = "${{ steps.read_version.outputs.value }}";
+            const isTagPush = context.ref.startsWith("refs/tags/");
 
-            const TAG_EXISTED = "tag_existed";
             const TAG_NAME = "tag_name";
+            const NEEDS_RELEASE = "needs_release";
+            const VERSION = "version";
 
-            core.setOutput(TAG_NAME, tag);
+            async function resolveVersionFromTag(tag) {
+              if (!tag.startsWith("cap-v")) {
+                throw new Error(`Invalid tag '${tag}'. Expected format 'cap-v<version>'`);
+              }
+              return tag.slice("cap-v".length);
+            }
 
             async function main() {
-              let tagExisted = true;
+              let tag = isTagPush ? context.ref.replace("refs/tags/", "") : `cap-v${versionFromCargo}`;
+              let version = isTagPush ? await resolveVersionFromTag(tag) : versionFromCargo;
+              let needsRelease = true;
 
-              try {
-                await github.rest.git.getRef({
-                  ref: tagRef,
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                });
-
-                tagExisted = true;
-                core.notice(`Release skipped as tag '${tag}' already exists. Update the version in '${{ env.APP_CARGO_TOML }}' before starting another release.`);
-              } catch (error) {
-                if ("status" in error && error.status === 404) tagExisted = false;
-                else throw error;
+              if (isTagPush) {
+                if (version !== versionFromCargo) {
+                  throw new Error(
+                    `Tag version (${version}) does not match Cargo.toml version (${versionFromCargo}) in '${{ env.APP_CARGO_TOML }}'`
+                  );
+                }
+              } else {
+                const tagRef = `tags/${tag}`;
+                try {
+                  await github.rest.git.getRef({
+                    ref: tagRef,
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                  });
+                  needsRelease = false;
+                  core.notice(
+                    `Release skipped as tag '${tag}' already exists. Update the version in '${{ env.APP_CARGO_TOML }}' before starting another release.`
+                  );
+                } catch (error) {
+                  if ("status" in error && error.status === 404) {
+                    needsRelease = true;
+                    await github.rest.git.createRef({
+                      ref: `refs/${tagRef}`,
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      sha: context.sha,
+                    });
+                  } else {
+                    throw error;
+                  }
+                }
               }
 
-             	core.setOutput(TAG_EXISTED, tagExisted);
-
-              if (!tagExisted)
-                await github.rest.git.createRef({
-                  ref: `refs/${tagRef}`,
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  sha: context.sha,
-                });
+              core.setOutput(TAG_NAME, tag);
+              core.setOutput(VERSION, version);
+              core.setOutput(NEEDS_RELEASE, needsRelease);
             }
 
             main();
@@ -83,8 +105,9 @@ jobs:
       - name: Create draft CN release
         id: create_cn_release
         uses: crabnebula-dev/cloud-release@v0
+        if: ${{ secrets.CN_API_KEY != '' }}
         with:
-          command: release draft ${{ env.CN_APPLICATION }} ${{ steps.read_version.outputs.value }} --framework tauri
+          command: release draft ${{ env.CN_APPLICATION }} ${{ steps.resolve_release.outputs.version }} --framework tauri
           api-key: ${{ secrets.CN_API_KEY }}
 
       - name: Create draft GH release
@@ -92,8 +115,8 @@ jobs:
         # TODO: Change to stable version when available
         uses: softprops/action-gh-release@v2
         with:
-          name: ${{ steps.read_version.outputs.value }}
-          tag_name: ${{ steps.create_tag.outputs.tag_name }}
+          name: ${{ steps.resolve_release.outputs.version }}
+          tag_name: ${{ steps.resolve_release.outputs.tag_name }}
           draft: true
           generate_release_notes: true
 
@@ -110,8 +133,8 @@ jobs:
                 method: "POST",
                 body: JSON.stringify({
                   type: "release-ready",
-                  tag: "${{ steps.create_tag.outputs.tag_name }}",
-                  version: "${{ steps.read_version.outputs.value }}",
+                  tag: "${{ steps.resolve_release.outputs.tag_name }}",
+                  version: "${{ steps.resolve_release.outputs.version }}",
                   releaseUrl: "${{ steps.create_gh_release.outputs.url }}",
                   interactionId: "${{ inputs.interactionId }}",
                   cnReleaseId
@@ -273,6 +296,7 @@ jobs:
 
       - name: Upload assets
         uses: crabnebula-dev/cloud-release@v0
+        if: ${{ secrets.CN_API_KEY != '' }}
         with:
           working-directory: apps/desktop
           command: release upload ${{ env.CN_APPLICATION }} "${{ needs.draft.outputs.version }}" --framework tauri
